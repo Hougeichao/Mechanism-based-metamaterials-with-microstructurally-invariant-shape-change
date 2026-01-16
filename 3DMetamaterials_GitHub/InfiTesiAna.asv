@@ -1,0 +1,261 @@
+%% This code verified that the only DoFs for dodecahedron unit cell model is three known counter-rotation mechanism motions
+% Please note that the labeling might be different from the arXiv version of manuscript
+tic; ccc;
+
+e1 = [1;0;0]; e2 = [0;1;0]; e3 = [0;0;1];
+a = [0;5*sqrt(3);-5]/10; b = [0;0;-10]/10; c = [0;-5*sqrt(3);-5]/10;
+F_des = [2 0 -sqrt(3)/4;0 2 -sqrt(3)/4;0 0 1.5];
+Ident = Rot3D(0,e3);
+R1_0 =Ident;
+R2_0 = Rot3D(pi/4,[1;1;1]/sqrt(3));
+l1_PT = [10*sqrt(3);0;0]/10;
+l2_PT = [0;10*sqrt(3);0]/10;
+l3_PT = [5*sqrt(3);5*sqrt(3);20]/10;
+d = (F_des - Ident)*l1_PT;
+e = (F_des - Ident)*l2_PT;
+f = (F_des - Ident)*l3_PT;
+
+
+%% Unit cell analysis
+
+M_ana = [
+    skewsym(a) -skewsym(a) zeros(3,15) -R2_0*skewsym(d) zeros(3,9) R2_0*skewsym(d) zeros(3,12);
+    skewsym(b) -skewsym(b) zeros(3,27) -R2_0*skewsym(d) zeros(3,9) R2_0*skewsym(d);
+    skewsym(c) -skewsym(c) zeros(3,15) -R2_0*skewsym(d) zeros(3,12) R2_0*skewsym(d) zeros(3,9);
+    
+    skewsym(b) zeros(3,3) -skewsym(b) zeros(3,24) -R2_0*skewsym(e) zeros(3,9) R2_0*skewsym(e);
+    skewsym(Rot3D(pi/2,e3)*c) zeros(3,3) -skewsym(Rot3D(pi/2,e3)*c) zeros(3,18) -R2_0*skewsym(e) zeros(3,3) R2_0*skewsym(e) zeros(3,12);
+    skewsym(Rot3D(pi/2,e3)*a) zeros(3,3) -skewsym(Rot3D(pi/2,e3)*a) zeros(3,18) -R2_0*skewsym(e) zeros(3,9) R2_0*skewsym(e) zeros(3,6);
+
+    skewsym(Rot3D(pi/2,e3)*a) zeros(3,15) -skewsym(Rot3D(pi/2,e3)*a) zeros(3,3) R2_0*skewsym(f-d-e) zeros(3,15) -R2_0*skewsym(f-d-e) zeros(3,3);
+    skewsym(c) zeros(3,15) -skewsym(c) zeros(3,9) R2_0*skewsym(f-d-e) zeros(3,9) -R2_0*skewsym(f-d-e) zeros(3,3);
+
+    skewsym(a) zeros(3,6) -skewsym(a) zeros(3,9) -R2_0*skewsym(f) zeros(3,9) R2_0*skewsym(f) zeros(3,12);
+    skewsym(Rot3D(pi/2,e3)*c) zeros(3,6) -skewsym(Rot3D(pi/2,e3)*c) zeros(3,15) -skewsym(f) zeros(3,3) skewsym(f) zeros(3,12); 
+    skewsym(a) zeros(3,6) -skewsym(a) zeros(3,15) R2_0*skewsym(f) zeros(3,12) -R2_0*skewsym(f) zeros(3,3);
+    skewsym(Rot3D(pi/2,e3)*c) zeros(3,6) -skewsym(Rot3D(pi/2,e3)*c) zeros(3,9) R2_0*skewsym(f) zeros(3,18) -R2_0*skewsym(f) zeros(3,3);
+
+    skewsym(a) zeros(3,12) -skewsym(a) zeros(3,9) R2_0*skewsym(f-d) zeros(3,12) -R2_0*skewsym(f-d) zeros(3,3);
+    skewsym(Rot3D(pi/2,e3)*a) zeros(3,12) -skewsym(Rot3D(pi/2,e3)*a) zeros(3,9) -R2_0*skewsym(f-d) zeros(3,9) R2_0*skewsym(f-d) zeros(3,6);
+    skewsym(a) zeros(3,12) -skewsym(a) zeros(3,6) -R2_0*skewsym(f-d) zeros(3,12) R2_0*skewsym(f-d) zeros(3,6);
+    skewsym(Rot3D(pi/2,e3)*a) zeros(3,12) -skewsym(Rot3D(pi/2,e3)*a) zeros(3,6) R2_0*skewsym(f-d) zeros(3,15) -R2_0*skewsym(f-d) zeros(3,3);
+
+    skewsym(Rot3D(-pi/2,e3)*a) zeros(3,9) -skewsym(Rot3D(-pi/2,e3)*a) zeros(3,15) -R2_0*skewsym(f-e) zeros(3,3) R2_0*skewsym(f-e) zeros(3,9);
+    skewsym(Rot3D(-pi/2,e3)*a) zeros(3,9) -skewsym(Rot3D(-pi/2,e3)*a) zeros(3,6) R2_0*skewsym(f-e) zeros(3,18) -R2_0*skewsym(f-e) zeros(3,3);
+    skewsym(c) zeros(3,9) -skewsym(c) zeros(3,15) R2_0*skewsym(f-e) zeros(3,9) -R2_0*skewsym(f-e) zeros(3,3);
+    skewsym(c) zeros(3,9) -skewsym(c) zeros(3,6) -R2_0*skewsym(f-e) zeros(3,12) R2_0*skewsym(f-e) zeros(3,9);
+
+    Ident -Ident zeros(3,42);
+    Ident -Ident zeros(3,42);
+    Ident zeros(3,3) -Ident zeros(3,39);
+    Ident zeros(3,3) -Ident zeros(3,39);
+    Ident zeros(3,15) -Ident zeros(3,27);
+    zeros(3,33) Ident zeros(3,9) -Ident;
+
+];
+
+nM = null(M_ana)
+
+%% The fact that null space vectors of M_ana has 6 DoF shows that the only bulk mechanism motion 
+
+%% Plotting one counter-rotating mechanism
+
+WRR = nM(:,1);
+
+wr = zeros(3,1,16);R_inf = zeros(3,3,16);
+
+for i = 1:length(wr)
+    wr(:,:,i) = WRR((i-1)*3+1:i*3);
+    if i < 8
+        R_inf(:,:,i) = Ident + skewsym(wr(:,:,i));
+    else
+        R_inf(:,:,i) = R2_0*(Ident + skewsym(wr(:,:,i)));
+    end
+end
+
+
+
+%%
+Node_ref = zeros(3,48);
+Node_def = zeros(3,48);
+
+
+Node_ref(:,1) = [0;0;0];
+Node_ref(:,2)= a;
+Node_ref(:,3)= a+b;
+Node_ref(:,4)= a+b+c;
+Node_ref(:,5)= b+c;
+Node_ref(:,6)= c;
+Node_ref(:,7)= -Rot3D(pi/2,e3)*c;
+Node_ref(:,8)= -Rot3D(pi/2,e3)*c+a;
+Node_ref(:,9)= a+b+Rot3D(pi/2,e3)*a;
+Node_ref(:,10) = a+b+c+Rot3D(pi/2,e3)*a;
+Node_ref(:,11) = b+c+Rot3D(pi/2,e3)*a;
+Node_ref(:,12) = c-Rot3D(pi/2,e3)*c;
+Node_ref(:,13) = -Rot3D(pi/2,e3)*c+Rot3D(pi/2,e3)*a;
+Node_ref(:,14) = -Rot3D(pi/2,e3)*c+a+Rot3D(pi/2,e3)*a;
+Node_ref(:,15) = a+b+Rot3D(pi/2,e3)*a-Rot3D(pi/2,e3)*c;
+Node_ref(:,16) = a+b+c+Rot3D(pi/2,e3)*a-Rot3D(pi/2,e3)*c;
+Node_ref(:,17) = b+c+Rot3D(pi/2,e3)*a-Rot3D(pi/2,e3)*c;
+Node_ref(:,18) = c+Rot3D(pi/2,e3)*a-Rot3D(pi/2,e3)*c;
+Node_ref(:,19) = f;
+Node_ref(:,20) = f-e;
+Node_ref(:,21) = d;
+Node_ref(:,22) = (-Rot3D(pi/2,e3)*c)+f;
+Node_ref(:,23) = (-Rot3D(pi/2,e3)*c)+(f-d);
+Node_ref(:,24) = (-Rot3D(pi/2,e3)*c)+(f-d-e);
+Node_ref(:,25) = (-Rot3D(pi/2,e3)*c)+(f-e);
+Node_ref(:,26) = (-Rot3D(pi/2,e3)*c+a)+(f-d);
+Node_ref(:,27) = (-Rot3D(pi/2,e3)*c+a)+f;
+Node_ref(:,28) = (-Rot3D(pi/2,e3)*c+a)+e;
+Node_ref(:,29) = a+f;
+Node_ref(:,30) = a+d;
+Node_ref(:,31) = a+(d+e);
+Node_ref(:,32) = a+e;
+Node_ref(:,33) = c+(f-e);
+Node_ref(:,34) = c+d;
+Node_ref(:,35) = (-Rot3D(pi/2,e3)*c+a+Rot3D(pi/2,e3)*a)+(f-d);
+Node_ref(:,36) = (-Rot3D(pi/2,e3)*c+a+Rot3D(pi/2,e3)*a)+e;
+Node_ref(:,37) = (a+b)+d;
+Node_ref(:,38) = (a+b)+(d+e);
+Node_ref(:,39) = (a+b)+e;
+Node_ref(:,40) = (c-Rot3D(pi/2,e3)*c)+(f-d-e);
+Node_ref(:,41) = (c-Rot3D(pi/2,e3)*c)+(f-e);
+Node_ref(:,42) = (-Rot3D(pi/2,e3)*c+Rot3D(pi/2,e3)*a)+(f-d-e);
+Node_ref(:,43) = (-Rot3D(pi/2,e3)*c+Rot3D(pi/2,e3)*a)+(f-d);
+Node_ref(:,44) = c+d+b;
+Node_ref(:,45) = c+d+(b+a);
+Node_ref(:,46) = (a+b)+e+(Rot3D(pi/2,e3)*a);
+Node_ref(:,47) = (a+b)+e+(Rot3D(pi/2,e3)*a-Rot3D(pi/2,e3)*c);
+Node_ref(:,48) = (-Rot3D(pi/2,e3)*c+Rot3D(pi/2,e3)*a)+(f-d-e)+c;
+
+
+Node_def(:,1) = [0;0;0];
+Node_def(:,2)= R_inf(:,:,1)*a;
+Node_def(:,3)= R_inf(:,:,1)*(a+b);
+Node_def(:,4)= R_inf(:,:,1)*(a+b+c);
+Node_def(:,5)= R_inf(:,:,1)*(b+c);
+Node_def(:,6)= R_inf(:,:,1)*c;
+Node_def(:,7)= R_inf(:,:,1)*(-Rot3D(pi/2,e3)*c);
+Node_def(:,8)= R_inf(:,:,1)*(-Rot3D(pi/2,e3)*c+a);
+Node_def(:,9)= R_inf(:,:,1)*(a+b+Rot3D(pi/2,e3)*a);
+Node_def(:,10) = R_inf(:,:,1)*(a+b+c+Rot3D(pi/2,e3)*a);
+Node_def(:,11) = R_inf(:,:,1)*(b+c+Rot3D(pi/2,e3)*a);
+Node_def(:,12) = R_inf(:,:,1)*(c-Rot3D(pi/2,e3)*c);
+Node_def(:,13) = R_inf(:,:,1)*(-Rot3D(pi/2,e3)*c+Rot3D(pi/2,e3)*a);
+Node_def(:,14) = R_inf(:,:,1)*(-Rot3D(pi/2,e3)*c+a+Rot3D(pi/2,e3)*a);
+Node_def(:,15) = R_inf(:,:,1)*(a+b+Rot3D(pi/2,e3)*a-Rot3D(pi/2,e3)*c);
+Node_def(:,16) = R_inf(:,:,1)*(a+b+c+Rot3D(pi/2,e3)*a-Rot3D(pi/2,e3)*c);
+Node_def(:,17) = R_inf(:,:,1)*(b+c+Rot3D(pi/2,e3)*a-Rot3D(pi/2,e3)*c);
+Node_def(:,18) = R_inf(:,:,1)*(c+Rot3D(pi/2,e3)*a-Rot3D(pi/2,e3)*c);
+Node_def(:,19) = R_inf(:,:,8)*f;
+Node_def(:,20) = R_inf(:,:,8)*(f-e);
+Node_def(:,21) = R_inf(:,:,8)*d;
+Node_def(:,22) = R_inf(:,:,1)*(-Rot3D(pi/2,e3)*c)+R_inf(:,:,15)*f;
+Node_def(:,23) = R_inf(:,:,1)*(-Rot3D(pi/2,e3)*c)+R_inf(:,:,15)*(f-d);
+Node_def(:,24) = R_inf(:,:,1)*(-Rot3D(pi/2,e3)*c)+R_inf(:,:,15)*(f-d-e);
+Node_def(:,25) = R_inf(:,:,1)*(-Rot3D(pi/2,e3)*c)+R_inf(:,:,15)*(f-e);
+Node_def(:,26) = R_inf(:,:,1)*(-Rot3D(pi/2,e3)*c+a)+R_inf(:,:,10)*(f-d);
+Node_def(:,27) = R_inf(:,:,1)*(-Rot3D(pi/2,e3)*c+a)+R_inf(:,:,10)*f;
+Node_def(:,28) = R_inf(:,:,1)*(-Rot3D(pi/2,e3)*c+a)+R_inf(:,:,10)*e;
+Node_def(:,29) = R_inf(:,:,1)*a+R_inf(:,:,12)*f;
+Node_def(:,30) = R_inf(:,:,1)*a+R_inf(:,:,12)*d;
+Node_def(:,31) = R_inf(:,:,1)*a+R_inf(:,:,12)*(d+e);
+Node_def(:,32) = R_inf(:,:,1)*a+R_inf(:,:,12)*e;
+Node_def(:,33) = R_inf(:,:,1)*c+R_inf(:,:,13)*(f-e);
+Node_def(:,34) = R_inf(:,:,1)*c+R_inf(:,:,13)*d;
+Node_def(:,35) = R_inf(:,:,1)*(-Rot3D(pi/2,e3)*c+a+Rot3D(pi/2,e3)*a)+R_inf(:,:,14)*(f-d);
+Node_def(:,36) = R_inf(:,:,1)*(-Rot3D(pi/2,e3)*c+a+Rot3D(pi/2,e3)*a)+R_inf(:,:,14)*e;
+Node_def(:,37) = R_inf(:,:,1)*(a+b)+R_inf(:,:,16)*d;
+Node_def(:,38) = R_inf(:,:,1)*(a+b)+R_inf(:,:,16)*(d+e);
+Node_def(:,39) = R_inf(:,:,1)*(a+b)+R_inf(:,:,16)*e;
+Node_def(:,40) = R_inf(:,:,1)*(c-Rot3D(pi/2,e3)*c)+R_inf(:,:,11)*(f-d-e);
+Node_def(:,41) = R_inf(:,:,1)*(c-Rot3D(pi/2,e3)*c)+R_inf(:,:,11)*(f-e);
+Node_def(:,42) = R_inf(:,:,1)*(-Rot3D(pi/2,e3)*c+Rot3D(pi/2,e3)*a)+R_inf(:,:,9)*(f-d-e);
+Node_def(:,43) = R_inf(:,:,1)*(-Rot3D(pi/2,e3)*c+Rot3D(pi/2,e3)*a)+R_inf(:,:,9)*(f-d);
+Node_def(:,44) = R_inf(:,:,1)*c+R_inf(:,:,13)*d+R_inf(:,:,2)*b;
+Node_def(:,45) = R_inf(:,:,1)*c+R_inf(:,:,13)*d+R_inf(:,:,2)*(b+a);
+Node_def(:,46) = R_inf(:,:,1)*(a+b)+R_inf(:,:,16)*e+R_inf(:,:,3)*(Rot3D(pi/2,e3)*a);
+Node_def(:,47) = R_inf(:,:,1)*(a+b)+R_inf(:,:,16)*e+R_inf(:,:,3)*(Rot3D(pi/2,e3)*a-Rot3D(pi/2,e3)*c);
+Node_def(:,48) = R_inf(:,:,1)*(-Rot3D(pi/2,e3)*c+Rot3D(pi/2,e3)*a)+R_inf(:,:,9)*(f-d-e)+R_inf(:,:,7)*c;
+
+
+
+coord_ref = Node_ref;
+coord_def = Node_def;
+
+x_ref = coord_ref(1,:);
+y_ref = coord_ref(2,:);
+z_ref = coord_ref(3,:);
+x_def = coord_def(1,:);
+y_def = coord_def(2,:);
+z_def = coord_def(3,:);
+
+idx_R1 = [1 2 3 4 5 6;2 3 9 15 14 8;13 14 15 16 17 18;5 6 12 18 17 11;1 2 8 7 NaN NaN;1 6 12 7 NaN NaN;7 12 18 13 NaN NaN;7 8 14 13 NaN NaN;3 4 10 9 NaN NaN;4 5 11 10 NaN NaN;10 11 17 16 NaN NaN;9 10 16 15 NaN NaN];
+idx_R2 = [34 44 45 37 30 21];
+idx_R3 = [28 32 39 46 47 36];
+idx_R4 = [19 22 27 29];
+idx_R5 = [20 25 41 33];
+idx_R6 = [23 26 35 43];
+idx_R7 = [24 40 48 42];
+idx_R8 = [1 21 19;1 20 21;1 19 20;19 20 21];
+idx_R9 = [13 42 43];
+idx_R10 = [8 27 28;8 26 27;8 26 28;26 27 28];
+idx_R11 = [12 40 41];
+idx_R12 = [2 30 29 NaN;2 32 29 NaN;29 30 31 NaN;29 31 32 NaN;2 30 31 32];
+idx_R13 = [6 33 34];
+idx_R14 = [14 35 36];
+idx_R15 = [7 22 25 NaN;7 22 23 NaN;7 23 24 NaN;7 24 25 NaN;22 23 24 25];
+idx_R16 = [3 37 38 39];
+
+c_ST = [0 1 1];
+c_Add = [1 1 0];
+
+
+figure();hold on;axis equal;axis off
+title('Unit Cell in Reference')
+view(3)
+patch('Faces',idx_R1,'Vertices', Node_ref','FaceColor', c_ST, 'facealpha', 0.5);
+patch('Faces',idx_R2,'Vertices', Node_ref','FaceColor', c_ST, 'facealpha', 0.5);
+patch('Faces',idx_R3,'Vertices', Node_ref','FaceColor', c_ST, 'facealpha', 0.5);
+patch('Faces',idx_R4,'Vertices', Node_ref','FaceColor', c_ST, 'facealpha', 0.5);
+patch('Faces',idx_R5,'Vertices', Node_ref','FaceColor', c_ST, 'facealpha', 0.5);
+patch('Faces',idx_R6,'Vertices', Node_ref','FaceColor', c_ST, 'facealpha', 0.5);
+patch('Faces',idx_R7,'Vertices', Node_ref','FaceColor', c_ST, 'facealpha', 0.5);
+patch('Faces',idx_R8,'Vertices', Node_ref','FaceColor', c_Add, 'facealpha', 0.5);
+patch('Faces',idx_R9,'Vertices', Node_ref','FaceColor', c_Add, 'facealpha', 0.5);
+patch('Faces',idx_R10,'Vertices', Node_ref','FaceColor', c_Add, 'facealpha', 0.5);
+patch('Faces',idx_R11,'Vertices', Node_ref','FaceColor', c_Add, 'facealpha', 0.5);
+patch('Faces',idx_R12,'Vertices', Node_ref','FaceColor', c_Add, 'facealpha', 0.5);
+patch('Faces',idx_R13,'Vertices', Node_ref','FaceColor', c_Add, 'facealpha', 0.5);
+patch('Faces',idx_R14,'Vertices', Node_ref','FaceColor', c_Add, 'facealpha', 0.5);
+patch('Faces',idx_R15,'Vertices', Node_ref','FaceColor', c_Add, 'facealpha', 0.5);
+patch('Faces',idx_R16,'Vertices', Node_ref','FaceColor', c_Add, 'facealpha', 0.5);
+
+
+plot3([x_ref(31) x_ref(4) x_ref(5) x_ref(9) x_ref(15) x_ref(18);x_ref(38) x_ref(45) x_ref(44) x_ref(46) x_ref(47) x_ref(48)],[y_ref(31) y_ref(4) y_ref(5) y_ref(9) y_ref(15) y_ref(18);y_ref(38) y_ref(45) y_ref(44) y_ref(46) y_ref(47) y_ref(48)],[z_ref(31) z_ref(4) z_ref(5) z_ref(9) z_ref(15) z_ref(18);z_ref(38) z_ref(45) z_ref(44) z_ref(46) z_ref(47) z_ref(48)],'b','LineWidth',1.2)
+
+%%
+figure();hold on;axis equal;axis off
+title('Unit Cell in Deformed')
+view(3)
+patch('Faces',idx_R1,'Vertices', Node_def','FaceColor', c_ST, 'facealpha', 0.5);
+patch('Faces',idx_R2,'Vertices', Node_def','FaceColor', c_ST, 'facealpha', 0.5);
+patch('Faces',idx_R3,'Vertices', Node_def','FaceColor', c_ST, 'facealpha', 0.5);
+patch('Faces',idx_R4,'Vertices', Node_def','FaceColor', c_ST, 'facealpha', 0.5);
+patch('Faces',idx_R5,'Vertices', Node_def','FaceColor', c_ST, 'facealpha', 0.5);
+patch('Faces',idx_R6,'Vertices', Node_def','FaceColor', c_ST, 'facealpha', 0.5);
+patch('Faces',idx_R7,'Vertices', Node_def','FaceColor', c_ST, 'facealpha', 0.5);
+patch('Faces',idx_R8,'Vertices', Node_def','FaceColor', c_Add, 'facealpha', 0.5);
+patch('Faces',idx_R9,'Vertices', Node_def','FaceColor', c_Add, 'facealpha', 0.5);
+patch('Faces',idx_R10,'Vertices', Node_def','FaceColor', c_Add, 'facealpha', 0.5);
+patch('Faces',idx_R11,'Vertices', Node_def','FaceColor', c_Add, 'facealpha', 0.5);
+patch('Faces',idx_R12,'Vertices', Node_def','FaceColor', c_Add, 'facealpha', 0.5);
+patch('Faces',idx_R13,'Vertices', Node_def','FaceColor', c_Add, 'facealpha', 0.5);
+patch('Faces',idx_R14,'Vertices', Node_def','FaceColor', c_Add, 'facealpha', 0.5);
+patch('Faces',idx_R15,'Vertices', Node_def','FaceColor', c_Add, 'facealpha', 0.5);
+patch('Faces',idx_R16,'Vertices', Node_def','FaceColor', c_Add, 'facealpha', 0.5);
+plot3([x_def(31) x_def(4) x_def(5) x_def(9) x_def(15) x_def(18);x_def(38) x_def(45) x_def(44) x_def(46) x_def(47) x_def(48)],[y_def(31) y_def(4) y_def(5) y_def(9) y_def(15) y_def(18);y_def(38) y_def(45) y_def(44) y_def(46) y_def(47) y_def(48)],[z_def(31) z_def(4) z_def(5) z_def(9) z_def(15) z_def(18);z_def(38) z_def(45) z_def(44) z_def(46) z_def(47) z_def(48)],'b','LineWidth',1.2)
+
+
+toc
